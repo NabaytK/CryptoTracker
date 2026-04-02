@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, RefreshControl, TouchableOpacity, ActivityIndicator, Linking } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { getCryptoNews } from '../../services/api';
 
 const C = { bg:'#0a0a0f', card:'#13131f', accent:'#a855f7', text:'#fff', sub:'#888', border:'#1a1a2e' };
 
@@ -12,19 +13,8 @@ export default function News() {
 
   const load = async () => {
     try {
-      const url = 'https://cryptopanic.com/api/developer/v2/posts/?auth_token=ca14bb0b936e7aeaf8dd695dacf4bdddb5e1f5bf&public=true&kind=news&regions=en';
-      const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url));
-      const json = await r.json();
-      if (json.results && json.results.length > 0) {
-        const d = json.results.map((item: any) => ({
-          title: item.title || '',
-          url: item.original_url || item.url || '',
-          body: item.description || '',
-          published_on: new Date(item.published_at).getTime() / 1000,
-          source: item.source?.title || 'CryptoPanic',
-        }));
-        setNews(d);
-      }
+      const data = await getCryptoNews();
+      setNews(data);
     } catch (e) {
       console.error('News fetch error:', e);
     } finally {
@@ -59,11 +49,11 @@ export default function News() {
       ) : news.map((item, i) => (
         <TouchableOpacity key={i} style={s.card} onPress={() => Linking.openURL(item.url)}>
           <View style={s.cardTop}>
-            <View style={s.sourceBadge}><Text style={s.sourceText}>{item.source}</Text></View>
+            <View style={s.sourceBadge}><Text style={s.sourceText}>{item.source_info?.name || item.source || 'News'}</Text></View>
             <Text style={{ color: '#888', fontSize: 11 }}>{timeAgo(item.published_on)}</Text>
           </View>
           <Text style={s.newsTitle}>{item.title}</Text>
-          <Text style={s.newsBody} numberOfLines={2}>{item.body}</Text>
+          {item.body ? <Text style={s.newsBody} numberOfLines={2}>{item.body}</Text> : null}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 }}>
             <Text style={{ color: C.accent, fontSize: 12, fontWeight: '600' }}>Read more</Text>
             <Ionicons name="arrow-forward" size={12} color={C.accent} />

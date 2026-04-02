@@ -42,12 +42,13 @@ export async function getTopMarketCoins(limit = 50): Promise<any[]> {
 
 export async function getBitcoinData(): Promise<any> {
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24h_change=true&include_market_cap=true');
+    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin');
     const d = await r.json();
+    if (!Array.isArray(d) || !d[0]) return { usd: 0, usd_24h_change: 0, usd_market_cap: 0 };
     return {
-      usd: d.bitcoin?.usd || 0,
-      usd_24h_change: d.bitcoin?.usd_24h_change || 0,
-      usd_market_cap: d.bitcoin?.usd_market_cap || 0,
+      usd: d[0].current_price || 0,
+      usd_24h_change: d[0].price_change_percentage_24h || 0,
+      usd_market_cap: d[0].market_cap || 0,
     };
   } catch { return { usd: 0, usd_24h_change: 0, usd_market_cap: 0 }; }
 }
@@ -76,8 +77,15 @@ export async function getCoinMarketData(id: string): Promise<any> {
 
 export async function getCryptoNews(): Promise<any[]> {
   try {
-    const r = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN&limit=20');
+    const r = await fetch('https://cryptopanic.com/api/v1/posts/?auth_token=ca14bb0b936e7aeaf8dd695dacf4bdddb5e1f5bf&public=true&kind=news');
     const d = await r.json();
-    return d.Data || [];
+    if (!d.results) return [];
+    return d.results.map((item: any) => ({
+      title: item.title || '',
+      url: item.url || '',
+      body: '',
+      published_on: new Date(item.published_at).getTime() / 1000,
+      source_info: { name: item.source?.title || 'News' },
+    }));
   } catch { return []; }
 }
