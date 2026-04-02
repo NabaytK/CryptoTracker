@@ -1,14 +1,8 @@
-const PROXY = 'https://corsproxy.io/?';
-
-async function fetchWithProxy(url: string) {
-  const r = await fetch(PROXY + encodeURIComponent(url));
-  return r.json();
-}
-
 export async function getMultiplePrices(ids: string[]): Promise<Record<string, any>> {
   try {
     const idsStr = ids.join(',');
-    const d = await fetchWithProxy(`https://api.coingecko.com/api/v3/simple/price?ids=${idsStr}&vs_currencies=usd&include_24h_change=true&include_market_cap=true`);
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${idsStr}&vs_currencies=usd&include_24h_change=true&include_market_cap=true`);
+    const d = await r.json();
     const result: Record<string, any> = {};
     for (const id of ids) {
       if (d[id]) {
@@ -25,7 +19,8 @@ export async function getMultiplePrices(ids: string[]): Promise<Record<string, a
 
 export async function getTopMarketCoins(limit = 50): Promise<any[]> {
   try {
-    const d = await fetchWithProxy(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${limit}&page=1&sparkline=false&price_change_percentage=24h`);
+    const r = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${limit}&page=1&sparkline=false&price_change_percentage=24h`);
+    const d = await r.json();
     if (!Array.isArray(d)) return [];
     return d.map((c: any) => ({
       id: c.id,
@@ -47,7 +42,8 @@ export async function getTopMarketCoins(limit = 50): Promise<any[]> {
 
 export async function getBitcoinData(): Promise<any> {
   try {
-    const d = await fetchWithProxy('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin');
+    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin');
+    const d = await r.json();
     if (!Array.isArray(d) || !d[0]) return { usd: 0, usd_24h_change: 0, usd_market_cap: 0 };
     return {
       usd: d[0].current_price || 0,
@@ -59,7 +55,8 @@ export async function getBitcoinData(): Promise<any> {
 
 export async function searchCoins(query: string): Promise<any[]> {
   try {
-    const d = await fetchWithProxy(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`);
+    const r = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`);
+    const d = await r.json();
     if (!d.coins) return [];
     return d.coins.slice(0, 10).map((c: any) => ({
       id: c.id,
@@ -72,14 +69,16 @@ export async function searchCoins(query: string): Promise<any[]> {
 
 export async function getCoinMarketData(id: string): Promise<any> {
   try {
-    const d = await fetchWithProxy(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_data=false&developer_data=false`);
+    const r = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_data=false&developer_data=false`);
+    const d = await r.json();
     return d.market_data || {};
   } catch { return {}; }
 }
 
 export async function getCryptoNews(): Promise<any[]> {
   try {
-    const d = await fetchWithProxy('https://min-api.cryptocompare.com/data/v2/news/?lang=EN&limit=20');
+    const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://min-api.cryptocompare.com/data/v2/news/?lang=EN&limit=20'));
+    const d = await r.json();
     return d.Data || [];
   } catch { return []; }
 }
