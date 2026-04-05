@@ -77,8 +77,15 @@ export async function getCoinMarketData(id: string): Promise<any> {
 
 export async function getCryptoNews(): Promise<any[]> {
   try {
-    const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://min-api.cryptocompare.com/data/v2/news/?lang=EN&limit=20'));
+    const r = await fetch('https://free-crypto-news.vercel.app/api/news?limit=20');
     const d = await r.json();
-    return d.Data || [];
+    if (!d.articles) return [];
+    return d.articles.map((item: any) => ({
+      title: item.title || '',
+      url: item.link || '',
+      body: item.description || '',
+      published_on: new Date(item.pubDate).getTime() / 1000,
+      source_info: { name: item.source || 'News' },
+    }));
   } catch { return []; }
 }
