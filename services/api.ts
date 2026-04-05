@@ -77,15 +77,15 @@ export async function getCoinMarketData(id: string): Promise<any> {
 
 export async function getCryptoNews(): Promise<any[]> {
   try {
-    const r = await fetch('https://nirholas.github.io/free-crypto-news/cache/latest.json');
+    const r = await fetch('/.netlify/functions/news');
     const d = await r.json();
-    if (!d.articles) return [];
-    return d.articles.map((item: any) => ({
+    if (!d.Data) return [];
+    return d.Data.map((item: any) => ({
       title: item.title || '',
-      url: item.link || '',
-      body: item.description || '',
-      published_on: new Date(item.pubDate).getTime() / 1000,
-      source_info: { name: item.source || 'News' },
+      url: item.url || '',
+      body: item.body || '',
+      published_on: item.published_on || 0,
+      source_info: { name: item.source_info?.name || 'News' },
     }));
   } catch { return []; }
 }
