@@ -77,7 +77,7 @@ export async function getCoinMarketData(id: string): Promise<any> {
 
 export async function getCryptoNews(): Promise<any[]> {
   try {
-    const r = await fetch('https://free-crypto-news.vercel.app/api/news?limit=20');
+    const r = await fetch('https://nirholas.github.io/free-crypto-news/cache/latest.json');
     const d = await r.json();
     if (!d.articles) return [];
     return d.articles.map((item: any) => ({
