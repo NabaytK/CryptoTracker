@@ -1,17 +1,21 @@
+const BASE = typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
+  ? '/.netlify/functions' 
+  : '/.netlify/functions';
+
 export async function getMultiplePrices(ids: string[]): Promise<Record<string, any>> {
   try {
     const idsStr = ids.join(',');
-    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${idsStr}&vs_currencies=usd&include_24h_change=true&include_market_cap=true`);
+    const r = await fetch(`${BASE}/market?ids=${idsStr}`);
     const d = await r.json();
     const result: Record<string, any> = {};
-    for (const id of ids) {
-      if (d[id]) {
-        result[id] = {
-          usd: d[id].usd || 0,
-          usd_24h_change: d[id].usd_24h_change || 0,
-          usd_market_cap: d[id].usd_market_cap || 0,
+    if (Array.isArray(d)) {
+      d.forEach((c: any) => {
+        result[c.id] = {
+          usd: c.current_price || 0,
+          usd_24h_change: c.price_change_percentage_24h || 0,
+          usd_market_cap: c.market_cap || 0,
         };
-      }
+      });
     }
     return result;
   } catch { return {}; }
@@ -19,7 +23,7 @@ export async function getMultiplePrices(ids: string[]): Promise<Record<string, a
 
 export async function getTopMarketCoins(limit = 50): Promise<any[]> {
   try {
-    const r = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${limit}&page=1&sparkline=false&price_change_percentage=24h`);
+    const r = await fetch(`${BASE}/market?limit=${limit}`);
     const d = await r.json();
     if (!Array.isArray(d)) return [];
     return d.map((c: any) => ({
@@ -42,7 +46,7 @@ export async function getTopMarketCoins(limit = 50): Promise<any[]> {
 
 export async function getBitcoinData(): Promise<any> {
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin');
+    const r = await fetch(`${BASE}/market?ids=bitcoin`);
     const d = await r.json();
     if (!Array.isArray(d) || !d[0]) return { usd: 0, usd_24h_change: 0, usd_market_cap: 0 };
     return {
@@ -77,7 +81,7 @@ export async function getCoinMarketData(id: string): Promise<any> {
 
 export async function getCryptoNews(): Promise<any[]> {
   try {
-    const r = await fetch('/.netlify/functions/news');
+    const r = await fetch(`${BASE}/news`);
     const d = await r.json();
     if (!d.Data) return [];
     return d.Data.map((item: any) => ({
