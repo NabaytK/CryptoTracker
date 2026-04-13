@@ -125,7 +125,7 @@ export default function Analytics() {
         setHoldings(enriched);
         setTotals(getPortfolioTotals(enriched));
       }
-    } catch(e){ console.error(e); }
+    } catch(e){ }
     finally { setLoading(false); setRefreshing(false); }
   };
 

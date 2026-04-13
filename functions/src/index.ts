@@ -53,9 +53,6 @@ async function sendSmsOtp(toE164: string, code: string) {
   });
 }
 
-// Firestore docs:
-// users/{uid} => { email, phoneE164, preferred2FA: 'email'|'phone', username, firstName, lastName }
-// otp/{uid} => { codeHash, expiresAt, triesLeft, lastSentAt, method, destinationMasked }
 
 export const startOtp = onCall(async (req) => {
   const uid = req.auth?.uid;
@@ -81,7 +78,6 @@ export const startOtp = onCall(async (req) => {
   const otpSnap = await otpRef.get();
   const otpData = otpSnap.exists ? (otpSnap.data() as any) : null;
 
-  // Basic rate limit: at most 1 send every 25 seconds
   if (otpData?.lastSentAt && nowMs() - otpData.lastSentAt < 25000) {
     throw new HttpsError("resource-exhausted", "Please wait before requesting a new code.");
   }
@@ -141,7 +137,6 @@ export const verifyOtp = onCall(async (req) => {
     throw new HttpsError("permission-denied", "Wrong code.");
   }
 
-  // clear otp on success
   await otpRef.delete();
 
   return { ok: true };

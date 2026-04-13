@@ -1,3 +1,4 @@
+// pulls the latest crypto news from cointelegraph rss
 exports.handler = async function() {
   try {
     const r = await fetch('https://cointelegraph.com/rss');

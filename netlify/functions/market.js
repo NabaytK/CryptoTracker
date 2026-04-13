@@ -1,3 +1,4 @@
+// gets coin market data from coincap and sends it to the app
 exports.handler = async function(event) {
   try {
     const params = event.queryStringParameters || {};

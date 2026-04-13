@@ -25,6 +25,7 @@ function getKey(): string {
   return 'txs_v2_' + uid;
 }
 
+// reads all saved trades for the logged in user from local storage
 export async function loadTransactions(): Promise<Transaction[]> {
   try {
     const r = await AsyncStorage.getItem(getKey());
@@ -34,17 +35,20 @@ export async function loadTransactions(): Promise<Transaction[]> {
   } catch { return []; }
 }
 
+// adds a new buy or sell trade to local storage
 export async function addTransaction(tx: Transaction): Promise<void> {
   const all = await loadTransactions();
   all.unshift(tx);
   await AsyncStorage.setItem(getKey(), JSON.stringify(all));
 }
 
+// deletes a trade from local storage using its id
 export async function deleteTransaction(id: string): Promise<void> {
   const all = await loadTransactions();
   await AsyncStorage.setItem(getKey(), JSON.stringify(all.filter(t => t.id !== id)));
 }
 
+// goes through all trades and works out what the user currently holds
 export async function loadPortfolio(): Promise<PortfolioHolding[]> {
   const txs = await loadTransactions();
   const map: Record<string, PortfolioHolding> = {};

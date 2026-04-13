@@ -35,12 +35,10 @@ export default function LoginScreen() {
   const [err, setErr] = useState('');
   const [otpSent, setOtpSent] = useState('');
 
-  // login fields
   const [lemail, setLemail] = useState('');
   const otpEmailRef = useRef('');
   const [lpw, setLpw] = useState('');
 
-  // signup fields
   const [fn, setFn] = useState('');
   const [ln, setLn] = useState('');
   const [uname, setUname] = useState('');
@@ -49,14 +47,12 @@ export default function LoginScreen() {
   const [spw, setSpw] = useState('');
   const [spw2, setSpw2] = useState('');
 
-  // 2fa
   const [otp, setOtp] = useState('');
 
   const clear = () => setErr('');
 
   const sendOtp = async (toEmail: string = '') => {
     if (!toEmail) toEmail = otpEmailRef.current;
-    console.log('SENDOTP CALLED WITH EMAIL:', toEmail);
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     await AsyncStorage.setItem('otp_code', code);
     await AsyncStorage.setItem('otp_exp', (Date.now() + 10 * 60 * 1000).toString());
@@ -75,8 +71,7 @@ export default function LoginScreen() {
           }
         })
       });
-      console.log('EmailJS response:', res.status, await res.text());
-    } catch(e) { console.error('EmailJS error:', e); }
+    } catch(e) { setErr('Failed to send code. Please try again.'); }
   };
 
   const doLogin = async () => {
@@ -117,7 +112,6 @@ export default function LoginScreen() {
         phone: phone.trim(),
         createdAt: new Date().toISOString(),
       });
-      console.log('DOLOGIN - lemail is:', lemail.trim());
       await sendOtp(semail.trim());
       setOtp('');
       setStep('twofa');

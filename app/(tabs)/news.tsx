@@ -16,7 +16,6 @@ export default function News() {
       const data = await getCryptoNews();
       setNews(data);
     } catch (e) {
-      console.error('News fetch error:', e);
     } finally {
       setLoading(false);
       setRefreshing(false);

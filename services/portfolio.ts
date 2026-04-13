@@ -8,6 +8,7 @@ export interface EnrichedHolding extends PortfolioHolding {
   profitLossPct: number;
   change24h: number;
 }
+// takes raw holdings and adds current price and profit or loss for each coin
 export function calculateHoldings(portfolio: PortfolioHolding[], prices: Record<string, any>): EnrichedHolding[] {
   return portfolio.map(h => {
     const p = prices[h.coinId] || {};
@@ -20,6 +21,7 @@ export function calculateHoldings(portfolio: PortfolioHolding[], prices: Record<
     return { ...h, avgCostBasis, currentPrice, currentValue, profitLoss, profitLossPct, change24h };
   });
 }
+// adds up the total value and total profit or loss across all holdings
 export function getPortfolioTotals(holdings: EnrichedHolding[]) {
   const totalValue = holdings.reduce((s, h) => s + h.currentValue, 0);
   const totalCost = holdings.reduce((s, h) => s + h.totalCost, 0);
@@ -27,6 +29,7 @@ export function getPortfolioTotals(holdings: EnrichedHolding[]) {
   const totalPLPct = totalCost > 0 ? (totalPL / totalCost) * 100 : 0;
   return { totalValue, totalCost, totalPL, totalPLPct };
 }
+// works out the average price change across all holdings over the last 24 hours
 export function getPortfolioAvgChange(holdings: EnrichedHolding[]): number {
   if (!holdings.length) return 0;
   return holdings.reduce((s, h) => s + h.change24h, 0) / holdings.length;

@@ -45,7 +45,7 @@ export default function Dashboard() {
         setTotals({ value:t.totalValue, pl:t.totalPL, plPct:t.totalPLPct });
         setAvgChange(avg);
       }
-    } catch(e) { console.error(e); } 
+    } catch(e) { } 
     finally { setLoading(false); setRefreshing(false); }
   };
 

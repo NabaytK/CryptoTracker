@@ -2,6 +2,7 @@ const BASE = typeof window !== 'undefined' && window.location.hostname !== 'loca
   ? '/.netlify/functions' 
   : '/.netlify/functions';
 
+// calls the market api and gets back the current price for each coin
 export async function getMultiplePrices(ids: string[]): Promise<Record<string, any>> {
   try {
     const idsStr = ids.join(',');
@@ -21,6 +22,7 @@ export async function getMultiplePrices(ids: string[]): Promise<Record<string, a
   } catch { return {}; }
 }
 
+// gets the top coins by market cap to show in the market screen
 export async function getTopMarketCoins(limit = 50): Promise<any[]> {
   try {
     const r = await fetch(`${BASE}/market?limit=${limit}`);
@@ -44,6 +46,7 @@ export async function getTopMarketCoins(limit = 50): Promise<any[]> {
   } catch { return []; }
 }
 
+// gets the current bitcoin price and how much it changed today
 export async function getBitcoinData(): Promise<any> {
   try {
     const r = await fetch(`${BASE}/market?ids=bitcoin`);
@@ -57,6 +60,7 @@ export async function getBitcoinData(): Promise<any> {
   } catch { return { usd: 0, usd_24h_change: 0, usd_market_cap: 0 }; }
 }
 
+// searches for coins by name or ticker symbol
 export async function searchCoins(query: string): Promise<any[]> {
   try {
     const r = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`);
@@ -79,6 +83,7 @@ export async function getCoinMarketData(id: string): Promise<any> {
   } catch { return {}; }
 }
 
+// gets the latest crypto news articles to show in the news screen
 export async function getCryptoNews(): Promise<any[]> {
   try {
     const r = await fetch(`${BASE}/news`);
