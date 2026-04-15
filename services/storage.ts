@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
+import { collection, doc, setDoc, getDocs, deleteDoc, query, orderBy } from 'firebase/firestore';
 
 export interface Transaction {
   id: string;
@@ -20,32 +20,28 @@ export interface PortfolioHolding {
   totalCost: number;
 }
 
-function getKey(): string {
-  const uid = auth.currentUser?.uid || 'guest';
-  return 'txs_v2_' + uid;
+function txCollection() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error('Not logged in');
+  return collection(db, 'users', uid, 'transactions');
 }
 
-// reads all saved trades for the logged in user from local storage
+// reads all saved trades for the logged in user from firestore
 export async function loadTransactions(): Promise<Transaction[]> {
   try {
-    const r = await AsyncStorage.getItem(getKey());
-    if (r) return JSON.parse(r);
-    const old = await AsyncStorage.getItem('txs_v1');
-    return old ? JSON.parse(old) : [];
+    const snap = await getDocs(query(txCollection(), orderBy('date', 'desc')));
+    return snap.docs.map(d => d.data() as Transaction);
   } catch { return []; }
 }
 
-// adds a new buy or sell trade to local storage
+// adds a new buy or sell trade to firestore
 export async function addTransaction(tx: Transaction): Promise<void> {
-  const all = await loadTransactions();
-  all.unshift(tx);
-  await AsyncStorage.setItem(getKey(), JSON.stringify(all));
+  await setDoc(doc(txCollection(), tx.id), tx);
 }
 
-// deletes a trade from local storage using its id
+// deletes a trade from firestore using its id
 export async function deleteTransaction(id: string): Promise<void> {
-  const all = await loadTransactions();
-  await AsyncStorage.setItem(getKey(), JSON.stringify(all.filter(t => t.id !== id)));
+  await deleteDoc(doc(txCollection(), id));
 }
 
 // goes through all trades and works out what the user currently holds
@@ -65,5 +61,6 @@ export async function loadHoldings(): Promise<PortfolioHolding[]> {
 }
 
 export async function clearAllData(): Promise<void> {
-  await AsyncStorage.removeItem(getKey());
+  const txs = await loadTransactions();
+  await Promise.all(txs.map(tx => deleteTransaction(tx.id)));
 }

@@ -5,7 +5,7 @@ A cryptocurrency portfolio tracking web app built with React Native and Expo Rou
 
 ## Live App
 
-**https://cryptotrackercapstone.netlify.app**
+*https://capstonecryptotracker.netlify.app/**
 
 Open the link above in any browser to view the app. No installation required.
 
