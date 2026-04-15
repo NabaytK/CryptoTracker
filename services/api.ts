@@ -2,12 +2,28 @@ const BASE = typeof window !== 'undefined' && window.location.hostname !== 'loca
   ? '/.netlify/functions' 
   : '/.netlify/functions';
 
+const _cache: Record<string, { ts: number; data: any }> = {};
+const CACHE_MS = 120000;
+
+async function cachedFetch(url: string): Promise<any> {
+  const now = Date.now();
+  if (_cache[url] && now - _cache[url].ts < CACHE_MS) return _cache[url].data;
+  const r = await fetch(url);
+  if (r.status === 429) {
+    if (_cache[url]) return _cache[url].data;
+    throw new Error('Rate limited');
+  }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const data = await r.json();
+  _cache[url] = { ts: now, data };
+  return data;
+}
+
 // calls the market api and gets back the current price for each coin
 export async function getMultiplePrices(ids: string[]): Promise<Record<string, any>> {
   try {
     const idsStr = ids.join(',');
-    const r = await fetch(`${BASE}/market?ids=${idsStr}`);
-    const d = await r.json();
+    const d = await cachedFetch(`${BASE}/market?ids=${idsStr}`);
     const result: Record<string, any> = {};
     if (Array.isArray(d)) {
       d.forEach((c: any) => {
@@ -25,8 +41,7 @@ export async function getMultiplePrices(ids: string[]): Promise<Record<string, a
 // gets the top coins by market cap to show in the market screen
 export async function getTopMarketCoins(limit = 50): Promise<any[]> {
   try {
-    const r = await fetch(`${BASE}/market?limit=${limit}`);
-    const d = await r.json();
+    const d = await cachedFetch(`${BASE}/market?limit=${limit}`);
     if (!Array.isArray(d)) return [];
     return d.map((c: any) => ({
       id: c.id,
@@ -49,8 +64,7 @@ export async function getTopMarketCoins(limit = 50): Promise<any[]> {
 // gets the current bitcoin price and how much it changed today
 export async function getBitcoinData(): Promise<any> {
   try {
-    const r = await fetch(`${BASE}/market?ids=bitcoin`);
-    const d = await r.json();
+    const d = await cachedFetch(`${BASE}/market?ids=bitcoin`);
     if (!Array.isArray(d) || !d[0]) return { usd: 0, usd_24h_change: 0, usd_market_cap: 0 };
     return {
       usd: d[0].current_price || 0,
