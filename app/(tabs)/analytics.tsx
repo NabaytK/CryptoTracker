@@ -117,8 +117,9 @@ export default function Analytics() {
 
   const load = async () => {
     try {
-      const [portfolio, btcData] = await Promise.all([loadPortfolio(), getBitcoinData().catch(()=>null)]);
+      const btcData = await getBitcoinData().catch(()=>null);
       setBtc(btcData);
+      const portfolio = await loadPortfolio();
       if (portfolio.length) {
         const prices = await getMultiplePrices(portfolio.map((h:any) => h.coinId)).catch(()=>({}));
         const enriched = calculateHoldings(portfolio, prices);
