@@ -24,6 +24,10 @@ export default function Dashboard() {
 
   const load = async () => {
     try {
+      await new Promise<void>(resolve => {
+        if (auth.currentUser) { resolve(); return; }
+        const unsub = auth.onAuthStateChanged(user => { unsub(); resolve(); });
+      });
       const u = auth.currentUser;
       if (u) {
         const snap = await getDoc(doc(db,'users',u.uid));
