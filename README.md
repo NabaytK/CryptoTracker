@@ -1,51 +1,53 @@
-# Welcome to your Expo app
 
+# CryptoTracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A cryptocurrency portfolio tracking web app built with React Native and Expo Router, deployed on Netlify.
 
-## Get started
+## Live App
 
-1. Install dependencies
+**https://cryptotrackercapstone.netlify.app**
 
-   ```bash
-   npm install
-   ```
+Open the link above in any browser to view the app. No installation required.
 
-2. Start the app
+## How to Use
 
-   ```bash
-   npx expo start
-   ```
+1. Open the live link above
 
-In the output, you'll find options to open the app in a
+2. Click **Sign Up** to create an account
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+3. Enter your name, email, and a strong password
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+4. A verification code will be sent to your email — enter it to confirm your account
 
-## Get a fresh project
+5. Log in and explore the dashboard, market data, news, analytics, and portfolio tracking
 
-When you're ready, run:
+## Features
 
-```bash
-npm run reset-project
-```
+- Live cryptocurrency market data
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- Portfolio tracking with profit/loss calculations
 
-## Learn more
+- Price charts with multiple time periods
 
-To learn more about developing your project with Expo, look at the following resources:
+- Crypto news feed
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- Analytics with risk assessment
 
-## Join the community
+- Two-factor authentication via email
 
-Join our community of developers creating universal apps.
+## Tech Stack
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- React Native + Expo Router
+
+- Firebase Authentication + Firestore
+
+- Netlify serverless functions
+
+- CoinGecko API (market data)
+
+- CryptoCompare API (news)
+
+## Note for Local Development
+
+The market and news features require Netlify's serverless functions and will not load when running locally with `npm run web`. Use the live deployed link above to see full functionality.
+
