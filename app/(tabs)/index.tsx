@@ -29,13 +29,13 @@ export default function Dashboard() {
         const snap = await getDoc(doc(db,'users',u.uid));
         if (snap.exists()) setName(snap.data().firstName || '');
       }
-      const [btcData, coins, port] = await Promise.all([
+      const [btcData, coins] = await Promise.all([
         getBitcoinData().catch(() => null),
         getTopMarketCoins(6).catch(() => []),
-        loadPortfolio().catch(() => []),
       ]);
       setBtc(btcData);
       setTopCoins(coins);
+      const port = await loadPortfolio().catch(() => []);
       if (port.length > 0) {
         const prices = await getMultiplePrices(port.map((h:any) => h.coinId)).catch(() => ({}));
         const enriched = calculateHoldings(port, prices);
